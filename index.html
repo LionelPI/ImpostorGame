@@ -1,20 +1,88 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mon projet 122</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>L'Imposteur Anime</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <header>
-    <h1>Mon projet</h1>
+
+<div class="anime-effects">
+  <span class="aura aura-left"></span>
+  <span class="aura aura-right"></span>
+  <span class="lightning lightning-1"></span>
+  <span class="lightning lightning-2"></span>
+</div>
+
+<main class="app">
+
+  <header class="title">
+    <h1></h1>
+    <h2></h2>
   </header>
 
-  <main>
-    <ul id="list"></ul>
-  </main>
+  <section id="setup" class="screen active panel">
+    <h3>✦ AJOUTER LES JOUEURS ✦</h3>
 
-  <script src="js/script.js"></script>
+    <div class="input-zone">
+      <input id="playerInput" type="text" placeholder="Nom du joueur..." />
+      <button id="addPlayerBtn">AJOUTER</button>
+    </div>
+
+    <div id="playersList"></div>
+
+    <button id="startBtn" class="big-btn">COMMENCER LA PARTIE</button>
+  </section>
+
+  <section id="reveal" class="screen panel">
+    <p id="playerCount"></p>
+    <h3 id="playerTurn"></h3>
+
+    <div class="word-card">
+      <p>TON MOT</p>
+      <h2 id="revealContent">?</h2>
+    </div>
+
+    <div class="buttons">
+      <button id="revealBtn">VOIR MON MOT</button>
+      <button id="nextPlayerBtn">JOUEUR SUIVANT</button>
+    </div>
+  </section>
+
+  <section id="discussion" class="screen panel">
+    <h3>DISCUSSION</h3>
+    <div class="group-icon">👥</div>
+    <p>Discutez pour trouver l’imposteur.</p>
+
+    <div id="timer">05:00</div>
+
+    <button id="timerBtn">LANCER LE CHRONO</button>
+    <button id="goVoteBtn" class="big-btn">PASSER AU VOTE</button>
+  </section>
+
+  <section id="vote" class="screen panel">
+    <h3>VOTE</h3>
+    <p>Choisissez le joueur à éliminer.</p>
+    <div id="voteList"></div>
+  </section>
+
+  <section id="eliminated" class="screen panel">
+    <h3>ÉLIMINATION</h3>
+
+    <div id="eliminatedContent"></div>
+
+    <button id="continueBtn" class="big-btn">CONTINUER LA PARTIE</button>
+  </section>
+
+  <section id="result" class="screen panel">
+    <h3>RÉSULTAT</h3>
+    <div id="resultContent"></div>
+    <button id="restartBtn" class="big-btn">REJOUER</button>
+  </section>
+
+</main>
+
+<script src="js/script.js"></script>
 </body>
 </html>

@@ -87,6 +87,12 @@ body::before {
   align-items: center;
   justify-content: center;
 
+  /* 👇 augmente cette valeur */
+  transform: translateY(400px);
+}
+
+/* 👇 AJOUTE ICI */
+#setup {
   transform: translateY(80px);
 }
 
@@ -460,5 +466,11 @@ button:hover {
   body {
     background-attachment: scroll;
     background-position: center top;
+  }
+
+  @media (max-width: 600px) {
+    .app {
+      transform: translateY(100px);
+    }
   }
 }

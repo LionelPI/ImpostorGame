@@ -116,10 +116,10 @@ let currentPlayer = 0;
 let impostorIndex = 0;
 let normalWord = "";
 let impostorWord = "";
-
 let timerSeconds = 300;
 let timerInterval = null;
 
+const homeScreen = document.getElementById("home");
 const setupScreen = document.getElementById("setup");
 const revealScreen = document.getElementById("reveal");
 const discussionScreen = document.getElementById("discussion");
@@ -137,13 +137,23 @@ const eliminatedContent = document.getElementById("eliminatedContent");
 const timer = document.getElementById("timer");
 const voteList = document.getElementById("voteList");
 
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        const intro = document.getElementById("intro");
+        if (intro) intro.style.display = "none";
+    }, 4000);
+});
+
 function showScreen(screen) {
-    setupScreen.classList.remove("active");
-    revealScreen.classList.remove("active");
-    discussionScreen.classList.remove("active");
-    voteScreen.classList.remove("active");
-    eliminatedScreen.classList.remove("active");
-    resultScreen.classList.remove("active");
+    [
+        homeScreen,
+        setupScreen,
+        revealScreen,
+        discussionScreen,
+        voteScreen,
+        eliminatedScreen,
+        resultScreen
+    ].forEach(s => s.classList.remove("active"));
 
     screen.classList.add("active");
 }
@@ -202,11 +212,7 @@ function prepareReveal() {
 }
 
 function revealWord() {
-    if (currentPlayer === impostorIndex) {
-        revealContent.textContent = impostorWord;
-    } else {
-        revealContent.textContent = normalWord;
-    }
+    revealContent.textContent = currentPlayer === impostorIndex ? impostorWord : normalWord;
 }
 
 function nextPlayer() {
@@ -236,7 +242,6 @@ function resetTimer() {
 function displayTimer() {
     const minutes = String(Math.floor(timerSeconds / 60)).padStart(2, "0");
     const seconds = String(timerSeconds % 60).padStart(2, "0");
-
     timer.textContent = `${minutes}:${seconds}`;
 }
 
@@ -350,6 +355,7 @@ function restartGame() {
     showScreen(setupScreen);
 }
 
+document.getElementById("playBtn").addEventListener("click", () => showScreen(setupScreen));
 document.getElementById("addPlayerBtn").addEventListener("click", addPlayer);
 document.getElementById("startBtn").addEventListener("click", startGame);
 document.getElementById("revealBtn").addEventListener("click", revealWord);

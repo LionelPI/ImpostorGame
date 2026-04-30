@@ -6,13 +6,12 @@
 
 body {
   min-height: 100vh;
-  filter: brightness(1.1) contrast(1.05);
   font-family: "Trebuchet MS", Arial, sans-serif;
   color: #f5e6c8;
   overflow-x: hidden;
 
   background-image:
-          linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.35)),
+          linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.38)),
           url("../images/download.png");
 
   background-size: cover;
@@ -26,13 +25,71 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-          radial-gradient(circle at center, transparent 25%, rgba(0, 0, 0, 0.5) 100%),
-          radial-gradient(circle at top, rgba(140, 0, 0, 0.3), transparent 45%);
+          radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.45) 100%),
+          radial-gradient(circle at top, rgba(140, 0, 0, 0.18), transparent 45%);
   pointer-events: none;
   z-index: 0;
 }
 
-.anime-effects {
+/* INTRO IMAGE */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  overflow: hidden;
+  background: black;
+  animation: introFadeOut 4s forwards;
+}
+
+.intro-bg {
+  position: absolute;
+  inset: 0;
+  background: url("../images/download.png");
+  background-size: cover;
+  background-position: center;
+  animation: cinematicZoom 4s ease forwards;
+}
+
+.intro::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+          radial-gradient(circle, transparent 30%, rgba(0,0,0,0.85) 100%),
+          linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.85));
+}
+
+@keyframes cinematicZoom {
+  0% {
+    transform: scale(1.3);
+    filter: brightness(0.5) contrast(1.2);
+  }
+
+  50% {
+    filter: brightness(0.9) contrast(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1) contrast(1.05);
+  }
+}
+
+@keyframes introFadeOut {
+  0%, 80% {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+/* EFFETS FOND */
+.mafia-effects {
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -65,15 +122,16 @@ body::before {
 @keyframes mafiaGlow {
   from {
     transform: scale(0.9);
-    opacity: 0.3;
+    opacity: 0.25;
   }
 
   to {
     transform: scale(1.2);
-    opacity: 0.6;
+    opacity: 0.55;
   }
 }
 
+/* APP */
 .app {
   position: relative;
   z-index: 2;
@@ -87,16 +145,123 @@ body::before {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  /* 👇 augmente cette valeur */
-  transform: translateY(800px);
 }
 
-/* 👇 AJOUTE ICI */
-#setup {
-  transform: translateY(80px);
+.screen {
+  display: none;
 }
 
+.screen.active {
+  display: block;
+  animation: screenAppear 0.45s ease;
+}
+
+@keyframes screenAppear {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* HOME */
+.home-screen {
+  width: 100%;
+  min-height: 100vh;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20px;
+  position: relative;
+}
+
+.home-screen.active {
+  display: flex;
+}
+
+.play-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 90%;
+  max-width: 400px;
+
+  padding: 20px;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 2px;
+
+  color: white;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #b30000, #ff1a1a);
+  cursor: pointer;
+  overflow: hidden;
+
+  box-shadow:
+          0 0 15px rgba(255, 0, 0, 0.6),
+          0 0 30px rgba(255, 0, 0, 0.4);
+
+  transition: all 0.25s ease;
+  animation: netflixPulse 2.5s infinite;
+}
+
+.play-btn:hover {
+  transform: translateX(-50%) scale(1.05);
+  box-shadow:
+          0 0 25px rgba(255, 0, 0, 1),
+          0 0 50px rgba(255, 0, 0, 0.8);
+}
+
+.play-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+
+  background: linear-gradient(
+          120deg,
+          transparent,
+          rgba(255,255,255,0.4),
+          transparent
+  );
+
+  transition: 0.6s;
+}
+
+.play-btn:hover::before {
+  left: 100%;
+}
+
+@keyframes netflixPulse {
+  0% {
+    box-shadow:
+            0 0 10px rgba(255, 0, 0, 0.5),
+            0 0 20px rgba(255, 0, 0, 0.3);
+  }
+
+  50% {
+    box-shadow:
+            0 0 30px rgba(255, 0, 0, 1),
+            0 0 60px rgba(255, 0, 0, 0.7);
+  }
+
+  100% {
+    box-shadow:
+            0 0 10px rgba(255, 0, 0, 0.5),
+            0 0 20px rgba(255, 0, 0, 0.3);
+  }
+}
+
+/* PANELS */
 .panel {
   width: 100%;
   background: linear-gradient(rgba(12, 8, 5, 0.88), rgba(0, 0, 0, 0.93));
@@ -122,27 +287,11 @@ body::before {
   text-shadow: 0 0 12px rgba(160, 0, 0, 0.9);
 }
 
-.screen {
-  display: none;
+#setup {
+  transform: translateY(80px);
 }
 
-.screen.active {
-  display: block;
-  animation: appear 0.35s ease;
-}
-
-@keyframes appear {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.97);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
+/* INPUTS */
 .input-zone {
   display: flex;
   gap: 12px;
@@ -170,6 +319,7 @@ input:focus {
           0 0 18px rgba(220, 160, 70, 0.45);
 }
 
+/* BUTTONS */
 button {
   border: none;
   border-radius: 10px;
@@ -200,6 +350,7 @@ button:hover {
   border: 1px solid rgba(230, 180, 80, 0.8);
 }
 
+/* JOUEURS */
 #playersList {
   margin-top: 18px;
 }
@@ -214,8 +365,6 @@ button:hover {
   border-radius: 10px;
   padding: 12px 14px;
   margin: 8px 0;
-
-  box-shadow: inset 0 0 12px rgba(255, 210, 120, 0.04);
 }
 
 .player span {
@@ -237,6 +386,7 @@ button:hover {
   box-shadow: none;
 }
 
+/* REVEAL */
 #playerCount {
   color: #d8a84f;
   font-weight: bold;
@@ -251,7 +401,7 @@ button:hover {
   border: 2px solid rgba(200, 145, 55, 0.9);
 
   background:
-          linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+          linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.78)),
           url("../images/download.png");
 
   background-size: cover;
@@ -290,8 +440,6 @@ button:hover {
 .group-icon {
   font-size: 55px;
   margin-bottom: 15px;
-  color: #c89b45;
-  text-shadow: 0 0 20px rgba(160, 0, 0, 0.9);
 }
 
 #timer {
@@ -304,6 +452,7 @@ button:hover {
           0 0 22px rgba(180, 0, 0, 0.9);
 }
 
+/* VOTE */
 #voteList {
   display: grid;
   gap: 12px;
@@ -315,6 +464,7 @@ button:hover {
   font-size: 18px;
 }
 
+/* ELIMINATION */
 #eliminatedContent {
   padding: 28px 18px;
   border-radius: 18px;
@@ -343,7 +493,6 @@ button:hover {
 
 .eliminated-text {
   font-size: 20px;
-  color: #f5e6c8;
 }
 
 .eliminated-warning {
@@ -353,6 +502,7 @@ button:hover {
   font-weight: bold;
 }
 
+/* RESULT */
 #resultContent {
   max-width: 700px;
   margin: auto;
@@ -412,25 +562,29 @@ button:hover {
 
 .result-box:first-child h4 {
   color: #d8a84f;
-  text-shadow: 0 0 18px rgba(230, 170, 80, 0.85);
 }
 
 .result-box:last-child h4 {
   color: #b70000;
-  text-shadow: 0 0 18px rgba(180, 0, 0, 1);
 }
 
 @media (max-width: 600px) {
   .app {
     padding: 22px 14px;
-    justify-content: center;
-    transform: translateY(60px);
   }
 
-  .input-zone {
-    flex-direction: column;
+  #setup {
+    transform: translateY(70px);
   }
 
+  .play-btn {
+    font-size: 24px;
+    padding: 18px;
+    bottom: 15px;
+    width: 92%;
+  }
+
+  .input-zone,
   .buttons {
     flex-direction: column;
   }
@@ -444,7 +598,7 @@ button:hover {
   }
 
   .panel h3 {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .word-card h2 {
@@ -467,11 +621,5 @@ button:hover {
   body {
     background-attachment: scroll;
     background-position: center top;
-  }
-
-  @media (max-width: 600px) {
-    .app {
-      transform: translateY(100px);
-    }
   }
 }

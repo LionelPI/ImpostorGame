@@ -6,12 +6,13 @@
 
 body {
   min-height: 100vh;
+  filter: brightness(1.1) contrast(1.05);
   font-family: "Trebuchet MS", Arial, sans-serif;
   color: #f5e6c8;
   overflow-x: hidden;
 
   background-image:
-          linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.75)),
+          linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.35)),
           url("../images/download.png");
 
   background-size: cover;
@@ -25,7 +26,7 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-          radial-gradient(circle at center, transparent 25%, rgba(0, 0, 0, 0.78) 100%),
+          radial-gradient(circle at center, transparent 25%, rgba(0, 0, 0, 0.5) 100%),
           radial-gradient(circle at top, rgba(140, 0, 0, 0.3), transparent 45%);
   pointer-events: none;
   z-index: 0;
@@ -88,7 +89,7 @@ body::before {
   justify-content: center;
 
   /* 👇 augmente cette valeur */
-  transform: translateY(400px);
+  transform: translateY(800px);
 }
 
 /* 👇 AJOUTE ICI */

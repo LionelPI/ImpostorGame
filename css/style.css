@@ -31,7 +31,7 @@ body::before {
   z-index: 0;
 }
 
-/* INTRO IMAGE */
+/* INTRO */
 .intro {
   position: fixed;
   inset: 0;
@@ -442,14 +442,15 @@ button:hover {
   margin-bottom: 15px;
 }
 
-#timer {
-  font-size: 54px;
+/* DISCUSSION */
+.first-speaker {
   margin: 25px 0;
+  font-size: clamp(42px, 10vw, 76px);
   color: #d8a84f;
-  font-weight: bold;
+  text-transform: uppercase;
   text-shadow:
           0 0 10px #000,
-          0 0 22px rgba(180, 0, 0, 0.9);
+          0 0 25px rgba(180, 0, 0, 1);
 }
 
 /* VOTE */
@@ -568,6 +569,7 @@ button:hover {
   color: #b70000;
 }
 
+/* MOBILE */
 @media (max-width: 600px) {
   .app {
     padding: 22px 14px;
@@ -601,12 +603,9 @@ button:hover {
     font-size: 21px;
   }
 
-  .word-card h2 {
+  .word-card h2,
+  .first-speaker {
     font-size: 38px;
-  }
-
-  #timer {
-    font-size: 42px;
   }
 
   .result-words {

@@ -2,83 +2,137 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>L'Imposteur</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Undercover</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+<main class="phone">
+  <div class="bg"></div>
+  <div class="grain"></div>
 
-<div id="intro" class="intro">
-  <div class="intro-bg"></div>
-</div>
+  <div class="logo">
+    <div class="hat">⌂</div>
+    <span>UNDER</span><span>COVER</span>
+  </div>
 
-<div class="mafia-effects">
-  <span class="aura aura-left"></span>
-  <span class="aura aura-right"></span>
-</div>
-
-<main class="app">
-
-  <section id="home" class="screen active home-screen">
-    <button id="playBtn" class="play-btn">▶ JOUER</button>
+  <section id="splash" class="screen splash active">
+    <div class="spy">🕵️‍♂️</div>
+    <div class="loader"></div>
   </section>
 
-  <section id="setup" class="screen panel">
-    <h3>Ajouter les joueurs</h3>
-
-    <div class="input-zone">
-      <input id="playerInput" type="text" placeholder="Nom du joueur..." />
-      <button id="addPlayerBtn">Ajouter</button>
-    </div>
-
-    <div id="playersList"></div>
-
-    <button id="startBtn" class="big-btn">Commencer la partie</button>
+  <section id="home" class="screen home">
+    <button class="play" onclick="go('setup')">▶ Jouer</button>
   </section>
 
-  <section id="reveal" class="screen panel">
-    <p id="playerCount"></p>
-    <h3 id="playerTurn"></h3>
+  <section id="setup" class="screen">
+    <div class="card">
+      <h1>Paramètres</h1>
 
-    <div class="word-card">
-      <p>Ton mot</p>
-      <h2 id="revealContent">?</h2>
-    </div>
+      <div class="label">Nombre de joueurs</div>
+      <input id="playerCount" class="input" type="number" min="3" max="20" value="4">
 
-    <div class="buttons">
-      <button id="revealBtn">Voir mon mot</button>
-      <button id="nextPlayerBtn">Joueur suivant</button>
+      <div class="row">
+        <div>
+          <div class="label">Imposteurs</div>
+          <input id="impostorCount" class="input" type="number" min="1" value="1">
+        </div>
+        <div>
+          <div class="label">Mister White</div>
+          <input id="whiteCount" class="input" type="number" min="0" value="0">
+        </div>
+      </div>
+
+      <button class="btn" onclick="preparePlayers()">Valider</button>
     </div>
   </section>
 
-  <section id="discussion" class="screen panel">
-    <h3>Discussion</h3>
-    <div class="group-icon">🕵️</div>
+  <section id="names" class="screen">
+    <div class="card">
+      <h1>Ajouter les joueurs</h1>
 
-    <p>La discussion commence avec :</p>
-    <h2 id="firstSpeaker" class="first-speaker"></h2>
+      <input id="nameInput" class="input" placeholder="Nom du joueur..." maxlength="14">
+      <button class="btn" onclick="addPlayer()">Ajouter</button>
 
-    <button id="goVoteBtn" class="big-btn">Passer au vote</button>
+      <div id="playerList" class="players"></div>
+
+      <button class="btn" onclick="startGame()">Commencer la partie</button>
+    </div>
   </section>
 
-  <section id="vote" class="screen panel">
-    <h3>Vote</h3>
-    <p>Choisissez le joueur à éliminer.</p>
-    <div id="voteList"></div>
+  <section id="reveal" class="screen">
+    <div class="card">
+      <div id="turnCount" class="mini-title">Joueur 1 / 4</div>
+      <h2 id="turnName">Tour du joueur</h2>
+
+      <div class="wordbox">
+        <div class="hidden-word">TON MOT</div>
+        <div id="wordDisplay" class="question">?</div>
+      </div>
+
+      <button id="showWordBtn" class="btn" onclick="showWord()">Voir mon mot</button>
+      <button class="btn secondary" onclick="nextReveal()">Joueur suivant</button>
+    </div>
   </section>
 
-  <section id="eliminated" class="screen panel">
-    <h3>Élimination</h3>
-    <div id="eliminatedContent"></div>
-    <button id="continueBtn" class="big-btn">Continuer la partie</button>
+  <section id="discussion" class="screen">
+    <div class="card">
+      <h1>Discussion</h1>
+      <div class="emoji">🕵️‍♂️</div>
+      <p class="small">La discussion commence avec :</p>
+      <div id="firstSpeaker" class="big-name yellow"></div>
+      <button class="btn" onclick="goVote()">Passer au vote</button>
+    </div>
   </section>
 
-  <section id="result" class="screen panel">
-    <h3>Résultat</h3>
-    <div id="resultContent"></div>
-    <button id="restartBtn" class="big-btn">Rejouer</button>
+  <section id="vote" class="screen">
+    <div class="card">
+      <h1>Vote</h1>
+      <p class="small vote-text">Choisissez le joueur à éliminer.</p>
+      <div id="voteList" class="vote-list"></div>
+    </div>
   </section>
 
+  <section id="elimination" class="screen">
+    <div class="card">
+      <h1>Élimination</h1>
+
+      <div class="result-box">
+        <div class="mini-title">Joueur éliminé</div>
+        <div id="elimName" class="big-name"></div>
+        <p id="elimText" class="small"></p>
+      </div>
+
+      <button class="btn" onclick="continueGame()">Continuer la partie</button>
+    </div>
+  </section>
+
+  <section id="result" class="screen">
+    <div class="card">
+      <h1>Résultat</h1>
+
+      <div class="result-box">
+        <p id="winnerText" class="mini-title"></p>
+        <div id="winnerName" class="big-name"></div>
+
+        <div class="result-box inner">
+          <div class="mini-title">Mot des joueurs</div>
+          <div id="civilWord" class="word"></div>
+
+          <div class="split">
+            <div class="mini-title">Mot de l’imposteur</div>
+            <div id="impostorWord" class="word danger"></div>
+          </div>
+        </div>
+
+        <p id="victoryText" class="mini-title victory"></p>
+      </div>
+
+      <button class="btn" onclick="resetGame()">Rejouer</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast"></div>
 </main>
 
 <script src="js/script.js"></script>

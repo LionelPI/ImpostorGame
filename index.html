@@ -3,185 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Under Cover</title>
+  <title>Undercover</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<main class="phone">
-  <div class="stars"></div>
-  <div class="mountains"></div>
-
-  <!-- MENU -->
-  <section id="home" class="screen active introScreen">
-    <div class="netflixIntro">
-      <div class="introLine"></div>
-      <h1 class="homeTitle">UNDER<br>COVER</h1>
-    </div>
-
-    <button class="btn playHomeBtn" onclick="showScreen('setup')">
-      Jouer
-    </button>
-  </section>
-
-  <!-- PARAMÈTRES -->
-  <section id="setup" class="screen">
-    <h2>Joueurs : <span id="playerCount">5</span></h2>
-
-    <div class="setupCard">
-      <div class="counter blue">
-        <button onclick="changePlayers(-1)">−</button>
-        <span><b id="civilCount">3</b> Civils</span>
-        <button onclick="changePlayers(1)">+</button>
-      </div>
-
-      <div class="counter dark">
-        <button onclick="changeRole('undercover', -1)">−</button>
-        <span><b id="undercoverCount">1</b> Undercover</span>
-        <button onclick="changeRole('undercover', 1)">+</button>
-      </div>
-
-      <div class="counter blue">
-        <button onclick="changeRole('white', -1)">−</button>
-        <span><b id="whiteCount">1</b> Mr.White</span>
-        <button onclick="changeRole('white', 1)">+</button>
-      </div>
-    </div>
-
-    <button class="playersBtn" onclick="openPlayersModal()">
-      👥 Joueurs
-    </button>
-
-    <button class="btn setupStart" onclick="startGame()">
-      Commencer
-    </button>
-  </section>
-
-  <!-- CARTE JOUEUR -->
-  <section id="card" class="screen">
-    <div class="top">
-      <button class="topBtn" onclick="showScreen('setup')">×</button>
-      <button class="topBtn">⋮</button>
-    </div>
-
-    <div class="cardBox">
-      <h2 id="cardName">Fred</h2>
-
-      <div class="avatar">
-        <img id="playerCardImage" src="" alt="">
-      </div>
-
-      <p id="cardText">Glisse vers le haut pour voir</p>
-
-      <div class="secret hidden" id="secretWord">
-        Hoka
-      </div>
-    </div>
-
-    <button class="btn pink" id="revealBtn" onclick="revealWord()">
-      Révéler
-    </button>
-
-    <button class="btn pink hidden" id="nextPlayerBtn" onclick="nextPlayer()">
-      Joueur suivant
-    </button>
-
-    <p class="hint">Passe le téléphone au joueur suivant</p>
-  </section>
-
-  <!-- DISCUSSION -->
-  <section id="discussion" class="screen discussionScreen">
-    <div class="top">
-      <button class="topBtn" onclick="showScreen('setup')">×</button>
-      <button class="topBtn">⋮</button>
-    </div>
-
-    <div class="discussionContent">
-      <p class="discussionLabel">Commence la discussion</p>
-      <h2 id="speaker">Arben</h2>
-    </div>
-
-    <button class="btn pink voteOnlyBtn" onclick="showVote()">
-      Voter
-    </button>
-  </section>
-
-  <!-- VOTE -->
-  <section id="vote" class="screen">
-    <h1>Qui est l'imposteur selon toi ?</h1>
-    <p class="hint">Discutez en groupe et choisissez qui éliminer</p>
-
-    <h2>❌ <span id="impostorLeft">1</span> imposteur restant</h2>
-
-    <div class="playersGrid" id="playersGrid"></div>
-
-    <button class="btn pink" onclick="confirmVote()">
-      Confirmer le vote
-    </button>
-  </section>
-
-  <section id="wrongVote" class="screen wrongVoteScreen">
-    <h1>Mauvais choix</h1>
-
-    <p>
-      <strong id="wrongPlayerName">Fred</strong>
-      n'était pas l'imposteur.
-    </p>
-
-    <button class="btn pink" onclick="showVote()">
-      Continuer
-    </button>
-  </section>
-
-  <!-- RÉSULTAT -->
-  <section id="result" class="screen">
-    <h2 class="backToMenu" onclick="goHome()">
-      ← Classement
-    </h2>
-
-    <h1 id="winnerText">L'imposteur gagne !</h1>
-
-    <p class="hint" id="reasonText">
-      Plus que 1 civil restant
-    </p>
-
-    <div class="resultCard">
-      <p>Mot secret</p>
-      <h2 id="finalWord">Hoka</h2>
-    </div>
-
-    <div id="ranking"></div>
-
-    <button class="btn pink" onclick="startGame()">
-      Rejouer
-    </button>
-  </section>
-
-  <!-- POPUP JOUEURS -->
-  <div class="modal hidden" id="playersModal">
-    <div class="modalContent playersSheet">
-
-      <div class="sheetHandle"></div>
-
-      <div class="addPlayerRow">
-        <input
-                type="text"
-                id="newPlayerInput"
-                placeholder="Ajoute un joueur"
-                autocomplete="off"
-        />
-
-        <button class="addPlayerBtn" onclick="addPlayerFromInput()">+</button>
-      </div>
-
-      <div id="playersList" class="playersList"></div>
-
-      <button class="btn pink validatePlayersBtn" onclick="savePlayers()">
-        Valider
-      </button>
-
-    </div>
+<div id="eliminationModal" class="modal hidden">
+  <div class="modal-card">
+    <p class="modal-small">Joueur éliminé</p>
+    <h2 id="eliminatedName"></h2>
+    <p id="eliminatedInfo"></p>
+    <button class="main-btn" onclick="closeEliminationModal()">Continuer</button>
   </div>
+</div>
+
+
+<main class="app">
+
+  <section id="home" class="screen active home">
+    <div class="title-wrapper">
+      <div class="undercover-title">
+        <span data-text="UNDER">UNDER</span>
+        <span data-text="COVER">COVER</span>
+      </div>
+      <div class="subtitle">— DÉMASQUE L’IMPOSTEUR —</div>
+    </div>
+
+    <button class="play-button" onclick="show('setup')">
+      <span>COMMENCER</span>
+    </button>
+  </section>
+
+  <section id="setup" class="screen">
+    <h1>Préparation</h1>
+
+    <div class="panel">
+      <label>Nom du joueur</label>
+
+      <div class="input-row">
+        <input id="playerName" placeholder="Ajouter des joueurs" />
+        <button onclick="addPlayer()">+</button>
+      </div>
+
+      <div id="playersList"></div>
+    </div>
+
+    <div class="panel">
+      <div class="counter">
+        <span>Imposteurs</span>
+        <button onclick="changeCount('impostor', -1)">−</button>
+        <strong id="impostorCount">1</strong>
+        <button onclick="changeCount('impostor', 1)">+</button>
+      </div>
+
+      <div class="counter">
+        <span>Mr White</span>
+        <button onclick="changeCount('white', -1)">−</button>
+        <strong id="whiteCount">1</strong>
+        <button onclick="changeCount('white', 1)">+</button>
+      </div>
+    </div>
+
+    <button class="main-btn" onclick="startGame()">Lancer la partie</button>
+  </section>
+
+  <section id="reveal" class="screen">
+    <h1 id="revealPlayer"></h1>
+
+    <div id="card" class="secret-card" onclick="revealRole()">
+      <p>Appuie pour voir ton mot</p>
+    </div>
+
+    <button id="nextBtn" class="main-btn hidden" onclick="nextPlayer()">Joueur suivant</button>
+  </section>
+
+  <section id="discussion" class="screen">
+    <h1>Discussion</h1>
+
+    <div class="panel center">
+      <p class="small">Le joueur qui commence est</p>
+      <h2 id="starter"></h2>
+    </div>
+
+    <button class="main-btn" onclick="openVote()">Voter</button>
+  </section>
+
+  <section id="vote" class="screen">
+    <h1>Vote</h1>
+
+    <p class="small center-text">Choisissez le joueur à éliminer</p>
+
+    <div id="voteList"></div>
+  </section>
+
+  <section id="result" class="screen">
+    <h1 id="resultTitle"></h1>
+
+    <div class="panel result-panel">
+      <p>Mot commun</p>
+      <h2 id="commonWord"></h2>
+    </div>
+
+    <div id="resultList"></div>
+
+    <button class="main-btn" onclick="restart()">Rejouer</button>
+  </section>
+
 </main>
 
 <script src="js/script.js"></script>

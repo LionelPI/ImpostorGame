@@ -1,5 +1,3 @@
-let names = [];
-
 const wordPairs = [
 
     /* 🎬 FILMS */
@@ -772,452 +770,272 @@ const wordPairs = [
 
 ];
 
-let settings = {
-    players: 5,
-    undercover: 1,
-    white: 1
-};
 
-let game = {
-    players: [],
-    currentPlayer: 0,
-    selected: null,
-    timer: null,
-    seconds: 240
-};
+let players = [];
+let impostorCount = 1;
+let whiteCount = 1;
 
-function showScreen(id){
-    document.querySelectorAll(".screen").forEach(screen => {
+let roles = [];
+let revealIndex = 0;
+let commonWord = "";
+let impostorWord = "";
+
+const $ = (id) => document.getElementById(id);
+
+function show(id) {
+    document.querySelectorAll(".screen").forEach((screen) => {
         screen.classList.remove("active");
     });
 
-    document.getElementById(id).classList.add("active");
+    $(id).classList.add("active");
 }
 
-function updateSettingsUI(){
-    const civils =
-        settings.players - settings.undercover - settings.white;
-
-    document.getElementById("playerCount").innerText =
-        settings.players;
-
-    document.getElementById("civilCount").innerText =
-        civils;
-
-    document.getElementById("undercoverCount").innerText =
-        settings.undercover;
-
-    document.getElementById("whiteCount").innerText =
-        settings.white;
-}
-
-function changePlayers(value){
-    const newTotal = settings.players + value;
-
-    if(newTotal < 3 || newTotal > 10){
-        return;
-    }
-
-    settings.players = newTotal;
-
-    if(settings.undercover + settings.white >= settings.players){
-        settings.undercover = 1;
-        settings.white = 1;
-    }
-
-    updateSettingsUI();
-}
-
-function changeRole(role,value){
-    const newValue = settings[role] + value;
-
-    if(newValue < 0){
-        return;
-    }
-
-    const otherRole =
-        role === "undercover"
-            ? settings.white
-            : settings.undercover;
-
-    if(newValue + otherRole >= settings.players){
-        return;
-    }
-
-    settings[role] = newValue;
-
-    updateSettingsUI();
-}
-
-let tempPlayers = [];
-
-function openPlayersModal(){
-    tempPlayers = [...names];
-
-    renderPlayersList();
-
-    document.getElementById("newPlayerInput").value = "";
-    document.getElementById("playersModal").classList.remove("hidden");
-}
-
-function closePlayersModal(){
-    document.getElementById("playersModal").classList.add("hidden");
-}
-
-function addPlayerFromInput(){
-    const input = document.getElementById("newPlayerInput");
-    const value = input.value.trim();
-
-    if(!value) return;
-
-    if(tempPlayers.length >= 10){
-        alert("Maximum 10 joueurs");
-        return;
-    }
-
-    tempPlayers.push(value);
-    input.value = "";
-    input.focus();
-
-    renderPlayersList();
-}
-
-function removeTempPlayer(index){
-    tempPlayers.splice(index,1);
-    renderPlayersList();
-}
-
-function renderPlayersList(){
-    const list = document.getElementById("playersList");
-
-    list.innerHTML = "";
-
-    tempPlayers.forEach((player,index) => {
-        const item = document.createElement("div");
-
-        item.className = "playerNameItem";
-
-        item.innerHTML = `
+function renderPlayers() {
+    $("playersList").innerHTML = players.map((player, index) => `
+    <div class="player-item">
       <span>${player}</span>
-      <button class="removePlayerBtn" onclick="removeTempPlayer(${index})">
-        −
-      </button>
-    `;
+      <button onclick="removePlayer(${index})">−</button>
+    </div>
+  `).join("");
 
-        list.appendChild(item);
-    });
+    $("impostorCount").textContent = impostorCount;
+    $("whiteCount").textContent = whiteCount;
 }
 
-function savePlayers(){
-    if(tempPlayers.length < 3){
-        alert("Ajoute au moins 3 joueurs");
-        return;
+function addPlayer() {
+    const input = $("playerName");
+    const name = input.value.trim();
+
+    if (!name) return;
+
+    players.push(name);
+    input.value = "";
+
+    renderPlayers();
+}
+
+function removePlayer(index) {
+    players.splice(index, 1);
+
+    const maxSpecials = Math.max(1, players.length - 2);
+
+    if (impostorCount + whiteCount > maxSpecials) {
+        whiteCount = Math.max(0, maxSpecials - impostorCount);
     }
 
-    names = [...tempPlayers];
-    settings.players = names.length;
-
-    updateSettingsUI();
-    closePlayersModal();
+    renderPlayers();
 }
 
-function startGame(){
-    clearInterval(game.timer);
+function changeCount(type, value) {
+    const maxSpecials = Math.max(1, players.length - 2);
+
+    if (type === "impostor") {
+        impostorCount = Math.max(0, impostorCount + value);
+    }
+
+    if (type === "white") {
+        whiteCount = Math.max(0, whiteCount + value);
+    }
+
+    if (impostorCount + whiteCount > maxSpecials) {
+        if (type === "impostor") impostorCount--;
+        if (type === "white") whiteCount--;
+    }
+
+    renderPlayers();
+}
+
+function startGame() {
+
+    if (players.length < 3) {
+        alert("Il faut au moins 3 joueurs.");
+        return;
+    }
 
     const pair =
-        wordPairs[
-            Math.floor(Math.random() * wordPairs.length)
-            ];
+        wordPairs[Math.floor(Math.random() * wordPairs.length)];
 
-    let roles = [];
+    commonWord = pair[0];
+    impostorWord = pair[1];
 
-    for(let i = 0; i < settings.undercover; i++){
-        roles.push("undercover");
+    roles = players.map(player => ({
+        name: player,
+        role: "Civil",
+        word: commonWord,
+        eliminated: false
+    }));
+
+    /* RANDOM IMPOSTORS */
+
+    let availableIndexes = [...players.keys()];
+
+    for (let i = 0; i < impostorCount; i++) {
+
+        const randomIndex =
+            Math.floor(Math.random() * availableIndexes.length);
+
+        const playerIndex =
+            availableIndexes[randomIndex];
+
+        roles[playerIndex].role = "Imposteur";
+        roles[playerIndex].word = impostorWord;
+
+        availableIndexes.splice(randomIndex, 1);
     }
 
-    for(let i = 0; i < settings.white; i++){
-        roles.push("white");
+    /* RANDOM MR WHITE */
+
+    for (let i = 0; i < whiteCount; i++) {
+
+        const randomIndex =
+            Math.floor(Math.random() * availableIndexes.length);
+
+        const playerIndex =
+            availableIndexes[randomIndex];
+
+        roles[playerIndex].role = "Mr White";
+        roles[playerIndex].word = "Tu es Mr White";
+
+        availableIndexes.splice(randomIndex, 1);
     }
 
-    while(roles.length < settings.players){
-        roles.push("civil");
-    }
+    revealIndex = 0;
 
-    roles = shuffleArray(roles);
+    prepareReveal();
 
-    const cardImages = [
-        "../images/card1.png",
-        "../images/card2.png",
-        "../images/card3.png",
-        "../images/card4.png"
-    ];
-
-    game.players = names
-        .slice(0, settings.players)
-        .map((name,index) => {
-            return {
-                name,
-                role: roles[index],
-                alive: true,
-                image: cardImages[index % cardImages.length],
-                word:
-                    roles[index] === "civil"
-                        ? pair[0]
-                        : roles[index] === "undercover"
-                            ? pair[1]
-                            : "Mr.White"
-            };
-        });
-
-    game.currentPlayer = 0;
-    game.selected = null;
-
-    loadCard();
-    showScreen("card");
+    show("reveal");
 }
 
-function loadCard(){
-    const player =
-        game.players[game.currentPlayer];
+function prepareReveal() {
+    const player = roles[revealIndex];
 
-    document.getElementById("playerCardImage").src = player.image;
+    $("revealPlayer").textContent = player.name;
 
-    document.getElementById("cardName").innerText =
-        player.name;
+    $("nextBtn").classList.add("hidden");
 
-    document.getElementById("secretWord").innerText =
-        player.word;
+    $("card").innerHTML = `
+    <p>Appuie pour voir ton mot</p>
+  `;
 
-    document.getElementById("secretWord")
-        .classList.add("hidden");
-
-    document.getElementById("nextPlayerBtn")
-        .classList.add("hidden");
-
-    document.getElementById("revealBtn")
-        .classList.remove("hidden");
-
-    document.getElementById("cardText").innerText =
-        "Glisse vers le haut pour voir";
+    $("card").onclick = revealRole;
 }
 
-function revealWord(){
-    document.getElementById("secretWord")
-        .classList.remove("hidden");
+function revealRole() {
+    const player = roles[revealIndex];
 
-    document.getElementById("nextPlayerBtn")
-        .classList.remove("hidden");
+    $("card").innerHTML = `
+    <div>
+      <div class="word">${player.word}</div>
+    </div>
+  `;
 
-    document.getElementById("revealBtn")
-        .classList.add("hidden");
-
-    document.getElementById("cardText").innerText =
-        "Mémorise ton mot";
+    $("card").onclick = null;
+    $("nextBtn").classList.remove("hidden");
 }
 
-function nextPlayer(){
-    game.currentPlayer++;
+function nextPlayer() {
+    revealIndex++;
 
-    if(game.currentPlayer < game.players.length){
-        loadCard();
-    }else{
-        startDiscussion();
-    }
-}
+    if (revealIndex >= roles.length) {
+        const alivePlayers = roles.filter((player) => !player.eliminated);
+        const starter = alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
 
-function startDiscussion(){
-    const alivePlayers = game.players.filter(player => player.alive);
-
-    const randomPlayer =
-        alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
-
-    document.getElementById("speaker").innerText = randomPlayer.name;
-
-    showScreen("discussion");
-}
-
-function updateTimer(){
-    const minutes =
-        String(Math.floor(game.seconds / 60)).padStart(2,"0");
-
-    const seconds =
-        String(game.seconds % 60).padStart(2,"0");
-
-    document.getElementById("timer").innerText =
-        `${minutes}:${seconds}`;
-}
-
-function showVote(){
-    clearInterval(game.timer);
-
-    const grid =
-        document.getElementById("playersGrid");
-
-    grid.innerHTML = "";
-
-    game.selected = null;
-
-    game.players
-        .filter(player => player.alive)
-        .forEach(player => {
-            const div = document.createElement("div");
-
-            div.className = "player";
-            div.innerHTML = `
-  <img src="${player.image}" class="voteCardImage" alt="">
-
-  <div class="voteCardOverlay">
-    ${player.name}
-  </div>
-`;div.innerHTML = `
-  <img src="${player.image}" class="voteCardImage" alt="">
-
-  <div class="voteCardOverlay">
-    ${player.name}
-  </div>
-`;
-
-            div.onclick = () => {
-                document
-                    .querySelectorAll(".player")
-                    .forEach(card => card.classList.remove("selected"));
-
-                div.classList.add("selected");
-
-                game.selected = player;
-            };
-
-            grid.appendChild(div);
-        });
-
-    updateImpostorLeft();
-
-    showScreen("vote");
-}
-
-function updateImpostorLeft(){
-    const impostors =
-        game.players.filter(player =>
-            player.alive && player.role !== "civil"
-        ).length;
-
-    document.getElementById("impostorLeft").innerText =
-        impostors;
-}
-
-function confirmVote(){
-    if(!game.selected){
-        alert("Choisis un joueur");
+        $("starter").textContent = starter.name;
+        show("discussion");
         return;
     }
 
-    game.selected.alive = false;
-
-    const votedRole = game.selected.role;
-    const votedName = game.selected.name;
-
-    const alive =
-        game.players.filter(player => player.alive);
-
-    const civils =
-        alive.filter(player => player.role === "civil").length;
-
-    const impostors =
-        alive.filter(player => player.role !== "civil").length;
-
-    if(impostors === 0){
-        endGame(
-            "Les civils gagnent !",
-            "Tous les imposteurs ont été trouvés"
-        );
-        return;
-    }
-
-    if(impostors >= civils){
-        endGame(
-            "L'imposteur gagne !",
-            "Plus que 1 civil restant"
-        );
-        return;
-    }
-
-    if(votedRole === "civil"){
-        document.getElementById("wrongPlayerName").innerText = votedName;
-        game.selected = null;
-        showScreen("wrongVote");
-        return;
-    }
-
-    game.selected = null;
-    startDiscussion();
+    prepareReveal();
 }
 
-function endGame(title,reason){
-    document.getElementById("winnerText").innerText =
-        title;
+function openVote() {
+    $("voteList").innerHTML = roles.map((player, index) => `
+    <div 
+      class="vote-item ${player.eliminated ? "dead" : ""}" 
+      onclick="eliminatePlayer(${index})"
+    >
+      <span>${player.name}</span>
+      <span>Éliminer</span>
+    </div>
+  `).join("");
 
-    document.getElementById("reasonText").innerText =
-        reason;
+    show("vote");
+}
 
-    const civil =
-        game.players.find(player => player.role === "civil");
+function eliminatePlayer(index) {
+    const player = roles[index];
 
-    document.getElementById("finalWord").innerText =
-        civil ? civil.word : "—";
+    if (player.eliminated) return;
 
-    const ranking =
-        document.getElementById("ranking");
+    player.eliminated = true;
 
-    ranking.innerHTML = "";
+    if (player.role === "Imposteur" || player.role === "Mr White") {
+        endGame(`${player.role} éliminé !`);
+        return;
+    }
 
-    game.players.forEach(player => {
-        const div = document.createElement("div");
+    const civilsLeft = roles.filter(p => p.role === "Civil" && !p.eliminated).length;
+    const enemiesLeft = roles.filter(p =>
+        (p.role === "Imposteur" || p.role === "Mr White") && !p.eliminated
+    ).length;
 
-        div.className = "rankItem";
+    if (civilsLeft <= 1 && enemiesLeft > 0) {
+        endGame("L'imposteur gagne !");
+        return;
+    }
 
-        const roleName =
-            player.role === "civil"
-                ? "Civil"
-                : player.role === "undercover"
-                    ? "Undercover"
-                    : "Mr.White";
+    $("eliminatedName").textContent = player.name;
+    $("eliminatedInfo").textContent = "Ce joueur était Civil. Continuez la chasse.";
 
-        div.innerHTML = `
+    $("eliminationModal").classList.remove("hidden");
+}
+
+
+function closeEliminationModal() {
+    $("eliminationModal").classList.add("hidden");
+    openVote();
+}
+
+
+
+
+function endGame(title) {
+    $("resultTitle").textContent = title;
+    $("commonWord").textContent = commonWord;
+
+    $("resultList").innerHTML = roles.map((player) => `
+    <div class="result-item">
       <div>
         <strong>${player.name}</strong><br>
-        <span>${roleName}</span>
+        <span class="badge">${player.role}</span>
       </div>
-      <span>${player.alive ? "vivant" : "éliminé"}</span>
-    `;
 
-        ranking.appendChild(div);
+      <span>
+        ${player.role === "Mr White" ? "Aucun mot" : player.word}
+      </span>
+    </div>
+  `).join("");
+
+    show("result");
+}
+
+function restart() {
+    roles = [];
+    revealIndex = 0;
+    commonWord = "";
+    impostorWord = "";
+
+    show("setup");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    renderPlayers();
+
+    const playerInput = $("playerName");
+
+    playerInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            addPlayer();
+        }
     });
-
-    showScreen("result");
-}
-
-document.addEventListener("keydown", function(e){
-    const modal = document.getElementById("playersModal");
-
-    if(e.key === "Enter" && modal && !modal.classList.contains("hidden")){
-        addPlayerFromInput();
-    }
 });
-
-function shuffleArray(array){
-    for(let i = array.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-
-    return array;
-}
-
-function goHome(){
-
-    clearInterval(game.timer);
-
-    showScreen("home");
-}
-
-updateSettingsUI();

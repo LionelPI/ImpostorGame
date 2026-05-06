@@ -731,22 +731,25 @@ body{
 /* CARTES JOUEUR */
 
 .cardBox{
-  margin-top:45px;
-  border-radius:22px;
-  overflow:hidden;
-  text-align:center;
+    margin-top:25px;
+    border-radius:22px;
+    overflow:hidden;
+    text-align:center;
 
-  background:
-          radial-gradient(circle at top,rgba(229,9,20,.25),transparent 32%),
-          linear-gradient(180deg,#151723,#080910);
+    max-height:72vh;
+    overflow-y:auto;
 
-  border:1px solid rgba(255,255,255,.12);
+    background:
+            radial-gradient(circle at top,rgba(229,9,20,.25),transparent 32%),
+            linear-gradient(180deg,#151723,#080910);
 
-  box-shadow:
-          0 25px 55px rgba(0,0,0,.8),
-          0 0 35px rgba(229,9,20,.25);
+    border:1px solid rgba(255,255,255,.12);
 
-  animation:cardNetflixIn .65s cubic-bezier(.2,1.25,.4,1) both;
+    box-shadow:
+            0 25px 55px rgba(0,0,0,.8),
+            0 0 35px rgba(229,9,20,.25);
+
+    animation:cardNetflixIn .65s cubic-bezier(.2,1.25,.4,1) both;
 }
 
 @keyframes cardNetflixIn{
@@ -800,12 +803,28 @@ body{
 }
 
 .secret{
-  background:#f5f5f5;
-  color:#050505;
-  padding:50px 40px;
-  font-size:50px;
-  font-weight:1000;
-  animation:secretReveal .45s cubic-bezier(.2,1.4,.4,1) both;
+    background:#f5f5f5;
+    color:#050505;
+
+    padding:35px 25px;
+
+    font-size:clamp(30px, 8vw, 50px);
+    line-height:1.1;
+    font-weight:1000;
+
+    word-break:break-word;
+    overflow-wrap:break-word;
+
+    animation:secretReveal .45s cubic-bezier(.2,1.4,.4,1) both;
+}
+
+.cardBox::-webkit-scrollbar{
+    width:4px;
+}
+
+.cardBox::-webkit-scrollbar-thumb{
+    background:#e50914;
+    border-radius:999px;
 }
 
 @keyframes secretReveal{

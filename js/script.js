@@ -782,6 +782,13 @@ let impostorWord = "";
 
 const $ = (id) => document.getElementById(id);
 
+const cardImages = [
+    "images/card1.png",
+    "images/card2.png",
+    "images/card3.png",
+    "images/card4.png"
+];
+
 function show(id) {
     document.querySelectorAll(".screen").forEach((screen) => {
         screen.classList.remove("active");
@@ -907,29 +914,47 @@ function startGame() {
 }
 
 function prepareReveal() {
+
     const player = roles[revealIndex];
+
+    $("card").classList.remove("revealed-card");
 
     $("revealPlayer").textContent = player.name;
 
+    $("card").classList.add("card-back");
+
+    $("card").innerHTML = `
+    <img src="${cardImages[revealIndex]}" alt="Carte joueur">
+  `;
+    $("card").innerHTML = `
+    <div class="card-frame">
+        <img src="${cardImages[revealIndex % cardImages.length]}">
+    </div>
+`;
+    $("card").onclick = revealRole;
     $("nextBtn").classList.add("hidden");
 
-    $("card").innerHTML = `
-    <p>Appuie pour voir ton mot</p>
-  `;
-
-    $("card").onclick = revealRole;
+    cardRevealed = false;
 }
-
 function revealRole() {
+
     const player = roles[revealIndex];
 
+    $("card").classList.remove("card-back");
+    $("card").classList.add("revealed-card");
+
+    let displayWord = player.word;
+
+    if(player.role === "Mr White"){
+        displayWord = "Mr White";
+    }
+
     $("card").innerHTML = `
-    <div>
-      <div class="word">${player.word}</div>
-    </div>
-  `;
+        <div class="word center-word">${displayWord}</div>
+    `;
 
     $("card").onclick = null;
+
     $("nextBtn").classList.remove("hidden");
 }
 
@@ -985,7 +1010,7 @@ function eliminatePlayer(index) {
     }
 
     $("eliminatedName").textContent = player.name;
-    $("eliminatedInfo").textContent = "Ce joueur était Civil. Continuez la chasse.";
+    $("eliminatedInfo").textContent = "Ce joueur était Civil.";
 
     $("eliminationModal").classList.remove("hidden");
 }

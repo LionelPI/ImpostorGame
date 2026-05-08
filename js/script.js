@@ -190,7 +190,7 @@ const wordPairs = [
     ["Optimiste", "Naïf"],
     ["Pessimiste", "Réaliste"],
     ["Indépendant", "Solitaire"],
-    ["Charismatique", "Manipulateur"]
+    ["Charismatique", "Manipulateur"],
 
     /* 🎬 FILMS (suite) */
     ["The Dark Knight", "The Batman"],
@@ -382,7 +382,7 @@ const wordPairs = [
     ["Stratégique", "Manipulateur"],
     ["Rêveur", "Distrait"],
     ["Ambitieux", "Obsédé"],
-    ["Indépendant", "Solitaire"]
+    ["Indépendant", "Solitaire"],
 
     /* 🎬 FILMS (suite) */
     ["The Matrix", "Blade Runner"],
@@ -574,7 +574,7 @@ const wordPairs = [
     ["Émotif", "Sensible"],
     ["Optimiste", "Positif"],
     ["Pessimiste", "Négatif"],
-    ["Indépendant", "Libre"]
+    ["Indépendant", "Libre"],
 
     /* 🎬 FILMS (suite) */
     ["Oppenheimer", "Tenet"],
@@ -766,7 +766,7 @@ const wordPairs = [
     ["Émotif", "Sensible"],
     ["Optimiste", "Espoir"],
     ["Pessimiste", "Sceptique"],
-    ["Indépendant", "Libre"]
+    ["Indépendant", "Libre"],
 
 ];
 
@@ -788,6 +788,12 @@ const cardImages = [
     "images/card3.png",
     "images/card4.png"
 ];
+
+let shuffledCardImages = [];
+
+function shuffleArray(array){
+    return [...array].sort(() => Math.random() - 0.5);
+}
 
 function show(id) {
     document.querySelectorAll(".screen").forEach((screen) => {
@@ -859,8 +865,26 @@ function startGame() {
         return;
     }
 
-    const pair =
-        wordPairs[Math.floor(Math.random() * wordPairs.length)];
+    let recentPairs = JSON.parse(localStorage.getItem("recentPairs")) || [];
+
+    let pairIndex;
+
+    do {
+        pairIndex = Math.floor(Math.random() * wordPairs.length);
+    } while (
+        recentPairs.includes(pairIndex) &&
+        recentPairs.length < wordPairs.length
+        );
+
+    recentPairs.push(pairIndex);
+
+    if (recentPairs.length > 300) {
+        recentPairs.shift();
+    }
+
+    localStorage.setItem("recentPairs", JSON.stringify(recentPairs));
+
+    const pair = wordPairs[pairIndex];
 
     commonWord = pair[0];
     impostorWord = pair[1];
@@ -908,6 +932,8 @@ function startGame() {
 
     revealIndex = 0;
 
+    shuffledCardImages = shuffleArray(cardImages);
+
     prepareReveal();
 
     show("reveal");
@@ -924,11 +950,8 @@ function prepareReveal() {
     $("card").classList.add("card-back");
 
     $("card").innerHTML = `
-    <img src="${cardImages[revealIndex]}" alt="Carte joueur">
-  `;
-    $("card").innerHTML = `
     <div class="card-frame">
-        <img src="${cardImages[revealIndex % cardImages.length]}">
+        <img src="${shuffledCardImages[revealIndex % shuffledCardImages.length]}">
     </div>
 `;
     $("card").onclick = revealRole;

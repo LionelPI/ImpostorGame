@@ -777,6 +777,8 @@ let whiteCount = 1;
 
 let selectedVoteIndex = null;
 
+let starterIndex = null;
+
 let roles = [];
 let revealIndex = 0;
 let commonWord = "";
@@ -1011,10 +1013,24 @@ function nextPlayer() {
     revealIndex++;
 
     if (revealIndex >= roles.length) {
-        const alivePlayers = roles.filter((player) => !player.eliminated);
-        const starter = alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
+        const aliveIndexes = roles
+            .map((player, index) => ({ player, index }))
+            .filter(item => !item.player.eliminated);
 
-        $("starter").textContent = starter.name;
+        const randomStarter = aliveIndexes[Math.floor(Math.random() * aliveIndexes.length)];
+
+        starterIndex = randomStarter.index;
+
+        $("starter").textContent =
+            randomStarter.player.name.charAt(0).toUpperCase() +
+            randomStarter.player.name.slice(1).toLowerCase();
+
+        $("starterCard").innerHTML = `
+            <div class="card-frame">
+                <img src="${voteImages[shuffledCardIndexes[starterIndex % shuffledCardIndexes.length]]}">
+            </div>
+        `;
+
         show("discussion");
         return;
     }

@@ -77,16 +77,18 @@
     <button id="nextBtn" class="main-btn hidden" onclick="nextPlayer()">Joueur suivant</button>
   </section>
 
-  <section id="discussion" class="screen">
-    <h1>Discussion</h1>
+    <section id="discussion" class="screen">
+        <h1>Discussion</h1>
 
-    <div class="panel center">
-      <p class="small">Le joueur qui commence est</p>
-      <h2 id="starter"></h2>
-    </div>
+        <div class="panel center starter-panel">
+            <p class="small">Le joueur qui commence est</p>
+            <h2 id="starter"></h2>
+        </div>
 
-    <button class="main-btn" onclick="openVote()">Voter</button>
-  </section>
+        <div id="starterCard" class="starter-card"></div>
+
+        <button class="main-btn" onclick="openVote()">Voter</button>
+    </section>
 
     <section id="vote" class="screen vote-screen">
         <h1>Qui est l'imposteur ?</h1>

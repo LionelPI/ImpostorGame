@@ -775,6 +775,8 @@ let players = [];
 let impostorCount = 1;
 let whiteCount = 1;
 
+let selectedVoteIndex = null;
+
 let roles = [];
 let revealIndex = 0;
 let commonWord = "";
@@ -783,6 +785,7 @@ let impostorWord = "";
 const $ = (id) => document.getElementById(id);
 
 const cardImages = [
+
     "images/card1.png",
     "images/card2.png",
     "images/card3.png",
@@ -792,11 +795,27 @@ const cardImages = [
     "images/card7.png",
     "images/card8.png",
     "images/card9.png",
-    "images/card10.png",
-    "images/card11.png"
+    "images/card10.png"
 ];
 
-let shuffledCardImages = [];
+const voteImages = [
+    "images/vote-card1.png",
+    "images/vote-card2.png",
+    "images/vote-card3.png",
+    "images/vote-card4.png",
+    "images/vote-card5.png",
+    "images/vote-card6.png",
+    "images/vote-card7.png",
+    "images/vote-card8.png",
+    "images/vote-card9.png",
+    "images/vote-card10.png"
+];
+
+let shuffledCardIndexes = [];
+
+function shuffleIndexes(length) {
+    return [...Array(length).keys()].sort(() => Math.random() - 0.5);
+}
 
 function shuffleArray(array){
     return [...array].sort(() => Math.random() - 0.5);
@@ -939,7 +958,7 @@ function startGame() {
 
     revealIndex = 0;
 
-    shuffledCardImages = shuffleArray(cardImages);
+    shuffledCardIndexes = shuffleIndexes(cardImages.length);
 
     prepareReveal();
 
@@ -947,20 +966,20 @@ function startGame() {
 }
 
 function prepareReveal() {
-
     const player = roles[revealIndex];
 
     $("card").classList.remove("revealed-card");
-
     $("revealPlayer").textContent = player.name;
-
     $("card").classList.add("card-back");
 
+    const imageIndex = shuffledCardIndexes[revealIndex % shuffledCardIndexes.length];
+
     $("card").innerHTML = `
-    <div class="card-frame">
-        <img src="${shuffledCardImages[revealIndex % shuffledCardImages.length]}">
-    </div>
-`;
+        <div class="card-frame">
+            <img src="${cardImages[imageIndex]}">
+        </div>
+    `;
+
     $("card").onclick = revealRole;
     $("nextBtn").classList.add("hidden");
 
@@ -1004,18 +1023,69 @@ function nextPlayer() {
 }
 
 function openVote() {
-    $("voteList").innerHTML = roles.map((player, index) => `
-    <div 
-      class="vote-item ${player.eliminated ? "dead" : ""}" 
-      onclick="eliminatePlayer(${index})"
-    >
-      <span>${player.name}</span>
-      <span>Éliminer</span>
-    </div>
-  `).join("");
+    selectedVoteIndex = null;
+
+    $("voteList").innerHTML = roles.map((player, index) => {
+        const imageIndex = shuffledCardIndexes[index % shuffledCardIndexes.length];
+
+        return `
+            <div 
+                class="vote-card-wrap ${player.eliminated ? "dead" : ""}" 
+                data-index="${index}"
+                onclick="selectVote(${index})"
+            >
+                <div class="vote-card">
+                    <img src="${voteImages[imageIndex]}" alt="${player.name}">
+                </div>
+
+                <div class="vote-name">
+                    ${player.name.charAt(0).toUpperCase() + player.name.slice(1).toLowerCase()}
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    $("confirmVoteBtn").classList.add("hidden");
 
     show("vote");
 }
+
+
+
+
+
+
+
+function selectVote(index) {
+    if (roles[index].eliminated) return;
+
+    selectedVoteIndex = index;
+
+    document.querySelectorAll(".vote-card-wrap").forEach(card => {
+        card.classList.remove("selected");
+    });
+
+    const selectedCard = document.querySelector(`.vote-card-wrap[data-index="${index}"]`);
+
+    if (selectedCard) {
+        selectedCard.classList.add("selected");
+    }
+
+    $("confirmVoteBtn").classList.remove("hidden");
+}
+
+
+
+
+function confirmVote() {
+
+    if (selectedVoteIndex === null) return;
+
+    eliminatePlayer(selectedVoteIndex);
+}
+
+
+
 
 function eliminatePlayer(index) {
     const player = roles[index];

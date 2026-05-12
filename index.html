@@ -88,13 +88,19 @@
     <button class="main-btn" onclick="openVote()">Voter</button>
   </section>
 
-  <section id="vote" class="screen">
-    <h1>Vote</h1>
+    <section id="vote" class="screen vote-screen">
+        <h1>Qui est l'imposteur ?</h1>
 
-    <p class="small center-text">Choisissez le joueur à éliminer</p>
+        <p class="vote-subtitle">
+            Discutez en groupe et choisissez qui éliminer
+        </p>
 
-    <div id="voteList"></div>
-  </section>
+        <div id="voteList" class="vote-grid"></div>
+
+        <button id="confirmVoteBtn" class="vote-confirm hidden" onclick="confirmVote()">
+            Confirmer le vote
+        </button>
+    </section>
 
   <section id="result" class="screen">
     <h1 id="resultTitle"></h1>

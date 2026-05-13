@@ -917,12 +917,19 @@ function startGame() {
     commonWord = pair[0];
     impostorWord = pair[1];
 
-    roles = players.map(player => ({
-        name: player,
-        role: "Civil",
-        word: commonWord,
-        eliminated: false
-    }));
+    shuffledCardIndexes = shuffleIndexes(cardImages.length);
+
+    roles = players.map((player, index) => {
+        const imageIndex = shuffledCardIndexes[index % shuffledCardIndexes.length];
+
+        return {
+            name: player,
+            role: "Civil",
+            word: commonWord,
+            imageIndex: imageIndex,
+            eliminated: false
+        };
+    });
 
     /* RANDOM IMPOSTORS */
 
@@ -960,7 +967,6 @@ function startGame() {
 
     revealIndex = 0;
 
-    shuffledCardIndexes = shuffleIndexes(cardImages.length);
 
     prepareReveal();
 
@@ -971,10 +977,13 @@ function prepareReveal() {
     const player = roles[revealIndex];
 
     $("card").classList.remove("revealed-card");
-    $("revealPlayer").textContent = player.name;
     $("card").classList.add("card-back");
 
-    const imageIndex = shuffledCardIndexes[revealIndex % shuffledCardIndexes.length];
+    $("revealPlayer").textContent =
+        player.name.charAt(0).toUpperCase() +
+        player.name.slice(1).toLowerCase();
+
+    const imageIndex = player.imageIndex;
 
     $("card").innerHTML = `
         <div class="card-frame">
@@ -987,6 +996,7 @@ function prepareReveal() {
 
     cardRevealed = false;
 }
+
 function revealRole() {
 
     const player = roles[revealIndex];
@@ -1026,10 +1036,10 @@ function nextPlayer() {
             randomStarter.player.name.slice(1).toLowerCase();
 
         $("starterCard").innerHTML = `
-            <div class="card-frame">
-                <img src="${voteImages[shuffledCardIndexes[starterIndex % shuffledCardIndexes.length]]}">
-            </div>
-        `;
+    <div class="card-frame">
+        <img src="${voteImages[roles[starterIndex].imageIndex]}">
+    </div>
+`;
 
         show("discussion");
         return;
@@ -1042,7 +1052,7 @@ function openVote() {
     selectedVoteIndex = null;
 
     $("voteList").innerHTML = roles.map((player, index) => {
-        const imageIndex = shuffledCardIndexes[index % shuffledCardIndexes.length];
+        const imageIndex = player.imageIndex;
 
         return `
             <div 
